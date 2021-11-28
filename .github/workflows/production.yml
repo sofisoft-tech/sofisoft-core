@@ -46,7 +46,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
         
       - name: Test with the dotnet CLI
-        run: dotnet test --no-build --verbosity normal --settings configs/coverlet.runsettings --logger:trx
+        run: dotnet test --no-build --configuration Release --verbosity normal --settings configs/coverlet.runsettings --logger:trx
         env:
           ASPNETCORE_ENVIRONMENT: Development
 
