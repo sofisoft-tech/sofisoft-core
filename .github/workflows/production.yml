@@ -43,7 +43,7 @@ jobs:
           dotnet sonarscanner begin /o:someorg /k:somekey /d:sonar.login=${{ secrets.SONAR_TOKEN }} /s:$GITHUB_WORKSPACE/configs/sonarqube.analysis.xml
         
       - name: Build
-        run: dotnet build --no-restore
+        run: dotnet build --no-restore --configuration Release
         
       - name: Test with the dotnet CLI
         run: dotnet test --no-build --verbosity normal --settings configs/coverlet.runsettings --logger:trx
