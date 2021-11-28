@@ -19,4 +19,4 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: Create Pack
-        run: dotnet Pack
+        run: dotnet pack
