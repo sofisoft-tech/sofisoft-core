@@ -1,0 +1,22 @@
+name: sofisoft-core-CD
+
+on:
+  workflow_run:
+    workflows: ["sofisoft-core-CI"]
+    types:
+      - completed
+
+jobs:
+  publish:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+
+      - name: Create Pack
+        run: dotnet Pack
