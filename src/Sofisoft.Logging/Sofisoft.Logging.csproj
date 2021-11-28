@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>Sofisoft.Logging</PackageId>
+    <Version>1.0.0-preview.1</Version>
+    <Title>Sofisoft Logger</Title>
+    <Description>Sofisoft's logging used for errors handlers.</Description>
+    <Authors>Sofisoft Lab</Authors>
+    <Company>Sofisoft Technologies SAC</Company>
+    <Copyright>© Sofisoft Technologies. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>logging-library, logger-middleware</PackageTags>
+    <RepositoryUrl>https://github.com/sofisoft-tech/sofisoft-core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sofisoft.Abstractions\Sofisoft.Abstractions.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2"/>
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
+  </ItemGroup>
+</Project>
