@@ -6,9 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <!-- <ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Sofisoft.Logging\Sofisoft.Logging.csproj"/>
-  </ItemGroup> -->
+    <ProjectReference Include="..\..\src\Sofisoft.Identity\Sofisoft.Identity.csproj"/>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />

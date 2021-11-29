@@ -1,0 +1,53 @@
+name: sofisoft-core-CI-DEV
+
+on:
+  push:
+    branches: [ dev ]
+    paths:
+      - 'src/**'
+      - 'test/**'
+  pull_request:
+    branches: [ dev ]
+    paths:
+      - 'src/**'
+      - 'test/**'
+      
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Disabling shallow clone is recommended for improving relevancy of sonarqube reporting
+          fetch-depth: 0
+
+      - name: Setup dotnet v5
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+      
+      - name: Setup dotnet v6
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+          
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Sonarqube Begin
+        run: | 
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet sonarscanner begin /o:someorg /k:somekey /d:sonar.login=${{ secrets.SONAR_TOKEN }} /s:$GITHUB_WORKSPACE/configs/sonarqube.analysis.xml
+        
+      - name: Build
+        run: dotnet build --no-restore
+        
+      - name: Test with the dotnet CLI
+        run: dotnet test --no-build --verbosity normal --settings configs/coverlet.runsettings --logger:trx
+        env:
+          ASPNETCORE_ENVIRONMENT: Development
+
+      - name: Sonarqube end
+        run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

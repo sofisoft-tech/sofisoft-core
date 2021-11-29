@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>Sofisoft.Identity</PackageId>
+    <Version>1.0.0-preview.2</Version>
+    <Title>Sofisoft Identity</Title>
+    <Description>Gets claims of the principal identity.</Description>
+    <Authors>Sofisoft Lab</Authors>
+    <Company>Sofisoft Technologies SAC</Company>
+    <Copyright>© Sofisoft Technologies. All rights reserved.</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>identity, claims</PackageTags>
+    <RepositoryUrl>https://github.com/sofisoft-tech/sofisoft-core</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\LICENSE" Pack="true" PackagePath=""/>
+    <None Include="..\..\README.md" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sofisoft.Abstractions\Sofisoft.Abstractions.csproj"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2"/>
+    <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8"/>
+  </ItemGroup>
+</Project>
