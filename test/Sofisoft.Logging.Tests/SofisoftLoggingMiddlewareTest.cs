@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -15,8 +13,6 @@ using Moq;
 using Sofisoft.Abstractions;
 using Sofisoft.Abstractions.Exceptions;
 using Sofisoft.Abstractions.Managers;
-using Sofisoft.Logging;
-using Sofisoft.Logging.Managers;
 using Xunit;
 
 namespace Sofisoft.Logging.Tests

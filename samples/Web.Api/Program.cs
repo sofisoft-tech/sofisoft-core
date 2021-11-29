@@ -10,6 +10,10 @@ builder.Services.AddSofisoft()
         options.SetBaseAddress("http://localhost:3000");
         options.SetTokenValue("dXNybG9nZ2luZzpBMTIzNDU2YQ==");
         options.SetSource("Sample Test");
+    })
+    .AddIdentity(options =>
+    {
+        options.SetUserIdKey("user_id");
     });
 
 builder.Services.AddControllers();
