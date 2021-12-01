@@ -68,27 +68,56 @@ namespace Sofisoft.MongoDb.Tests
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public async Task CountAsync_return_count(bool hasActiveTransaction)
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public async Task CountAsync_return_count(bool hasActiveTransaction, bool withFilterExpresion)
         {
             // Arrange
             var expectedResult = 1L;
-            var clientSessionMock = new Mock<IClientSessionHandle>();
+            var cancellationToken = new CancellationTokenSource().Token;
             var collectionMock = new Mock<IMongoCollection<FakeDocument>>();
-
-            collectionMock.Setup(x => x.CountDocumentsAsync(It.IsAny<FilterDefinition<FakeDocument>>(), It.IsAny<CountOptions>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedResult);
-            collectionMock.Setup(x => x.CountDocumentsAsync(It.IsAny<IClientSessionHandle>(), It.IsAny<FilterDefinition<FakeDocument>>(), It.IsAny<CountOptions>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(expectedResult);
+            Expression<Func<FakeDocument, bool>> filterExpression = p => p.Id == "1";
+            var session = new Mock<IClientSessionHandle>().Object;
+            
             _contextMock.Setup(x => x.HasActiveTransaction)
                 .Returns(hasActiveTransaction);
+            _contextMock.Setup(x => x.GetCurrentSession())
+                .Returns(session);
             _contextMock.Setup(x => x.Database.GetCollection<FakeDocument>("fakeDocument", It.IsAny<MongoCollectionSettings>()))
                 .Returns(collectionMock.Object);
 
+            if (hasActiveTransaction)
+            {
+                if (withFilterExpresion)
+                {
+                    collectionMock.Setup(x => x.CountDocumentsAsync(session, It.IsAny<ExpressionFilterDefinition<FakeDocument>>(), It.IsAny<CountOptions>(), cancellationToken))
+                        .ReturnsAsync(expectedResult);
+                }
+                else
+                {
+                    collectionMock.Setup(x => x.CountDocumentsAsync(session, FilterDefinition<FakeDocument>.Empty, It.IsAny<CountOptions>(), cancellationToken))
+                        .ReturnsAsync(expectedResult);
+                }
+            }
+            else
+            {
+                if (withFilterExpresion)
+                {
+                    collectionMock.Setup(x => x.CountDocumentsAsync(It.IsAny<ExpressionFilterDefinition<FakeDocument>>(), It.IsAny<CountOptions>(), cancellationToken))
+                        .ReturnsAsync(expectedResult);
+                }
+                else
+                {
+                    collectionMock.Setup(x => x.CountDocumentsAsync(FilterDefinition<FakeDocument>.Empty, It.IsAny<CountOptions>(), cancellationToken))
+                        .ReturnsAsync(expectedResult);
+                }
+            }
+
             // Act
             var repository = new MongoDbRepository<FakeDocument>(_contextMock.Object);
-            var result = await repository.CountAsync(p => true, It.IsAny<CancellationToken>());
+            var result = await repository.CountAsync(withFilterExpresion ? filterExpression : It.IsAny<Expression<Func<FakeDocument, bool>>>(), cancellationToken);
 
             // Assert
             Assert.Equal(expectedResult, result);

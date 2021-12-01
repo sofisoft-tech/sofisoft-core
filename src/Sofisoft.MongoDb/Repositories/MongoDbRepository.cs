@@ -91,11 +91,11 @@ namespace Sofisoft.MongoDb.Repositories
         }
 
         public virtual Task<long> UpdateOneAsync(
-            TDocument document,
+            TDocument entity,
             CancellationToken cancellationToken = default)
         {
-            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, document.Id);
-            var update = GetUpdateDefinition(document);
+            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, entity.Id);
+            var update = GetUpdateDefinition(entity);
             var options = new UpdateOptions { IsUpsert = false };
 
             if(_ctx.HasActiveTransaction)
