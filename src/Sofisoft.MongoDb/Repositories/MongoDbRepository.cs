@@ -68,6 +68,64 @@ namespace Sofisoft.MongoDb.Repositories
             );
         }
 
+        public virtual Task DeleteByIdAsync(
+            string id,
+            CancellationToken cancellationToken = default)
+        {
+            var filter = Builders<TDocument>
+                .Filter.Eq(doc => doc.Id, id);
+
+            if(_ctx.HasActiveTransaction)
+            {
+                return GetCollection().FindOneAndDeleteAsync(
+                    _ctx.GetCurrentSession(),
+                    filter,
+                    cancellationToken: cancellationToken
+                );
+            }
+
+            return GetCollection().FindOneAndDeleteAsync(
+                filter,
+                cancellationToken: cancellationToken
+            );
+        }
+
+        public virtual Task<long> UpdateOneAsync(
+            TDocument document,
+            CancellationToken cancellationToken = default)
+        {
+            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, document.Id);
+            var update = GetUpdateDefinition(document);
+            var options = new UpdateOptions { IsUpsert = false };
+
+            if(_ctx.HasActiveTransaction)
+            {
+                return Task.Run(() =>
+                {
+                    var updateResult = GetCollection()
+                        .UpdateOne(
+                            _ctx.GetCurrentSession(),
+                            filter,
+                            update,
+                            options, cancellationToken);
+
+                    return updateResult.ModifiedCount;
+                }, cancellationToken);
+            }
+
+            return Task.Run(() =>
+            {
+                var updateResult = GetCollection()
+                    .UpdateOne(
+                        filter,
+                        update,
+                        options,
+                        cancellationToken);
+
+                    return updateResult.ModifiedCount;
+                }, cancellationToken);
+        }
+
         #endregion
 
         #region  Privates Methods
@@ -88,7 +146,7 @@ namespace Sofisoft.MongoDb.Repositories
 
             if (attribute is null)
             {
-                throw new ArgumentNullException(nameof(attribute));
+                throw new KeyNotFoundException(nameof(attribute));
             }
 
             return attribute.CollectionName;
