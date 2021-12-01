@@ -75,7 +75,7 @@ namespace Sofisoft.MongoDb.Tests
         public async Task CountAsync_return_count(bool hasActiveTransaction, bool withFilterExpresion)
         {
             // Arrange
-            var expectedResult = 1L;
+            var expectedResult = 2L;
             var cancellationToken = new CancellationTokenSource().Token;
             var collectionMock = new Mock<IMongoCollection<FakeDocument>>();
             Expression<Func<FakeDocument, bool>> filterExpression = p => p.Id == "1";
