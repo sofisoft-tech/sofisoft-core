@@ -1,9 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using Sofisoft.Abstractions;
 
 namespace Sofisoft.MongoDb
 {
+    [ExcludeFromCodeCoverage]
     public class SofisoftMongoDbContext : ISofisoftMongoDbContext
     {
         #region Variables

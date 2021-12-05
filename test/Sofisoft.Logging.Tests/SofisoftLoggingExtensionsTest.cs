@@ -1,10 +1,9 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Sofisoft.Logging;
 using Xunit;
 
-namespace Sofisoft.Abstractions.Tests
+namespace Sofisoft.Logging.Tests
 {
     public class SofisoftLoggingExtensionsTest
     {

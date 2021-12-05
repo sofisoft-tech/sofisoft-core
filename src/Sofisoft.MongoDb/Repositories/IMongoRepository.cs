@@ -4,7 +4,7 @@ using Sofisoft.Abstractions.Repositories;
 
 namespace Sofisoft.MongoDb.Repositories
 {
-    public interface IMongoDbRepository<TDocument> : IRepository<TDocument>
+    public interface IMongoRepository<TDocument> : IRepository<TDocument>
         where TDocument : IEntity
     {
 

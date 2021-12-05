@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Sofisoft.Logging\Sofisoft.Logging.csproj"/>
+    <ProjectReference Include="..\..\src\Sofisoft.MongoDb\Sofisoft.MongoDb.csproj"/>
     <ProjectReference Include="..\..\src\Sofisoft.Identity\Sofisoft.Identity.csproj"/>
   </ItemGroup>
 

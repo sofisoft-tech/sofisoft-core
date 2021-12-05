@@ -1,22 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Moq;
 using Sofisoft.MongoDb.Attributes;
 using Sofisoft.MongoDb.Models;
 using Sofisoft.MongoDb.Repositories;
 using Xunit;
+using static Sofisoft.MongoDb.Tests.MongoRepositoryTest;
 
 namespace Sofisoft.MongoDb.Tests
 {
-    public class MongoDbRepositoryTest
+    public class MongoRepositoryTest
     {
         private readonly Mock<ISofisoftMongoDbContext> _contextMock;
 
-        public MongoDbRepositoryTest()
+        public MongoRepositoryTest()
         {
             _contextMock = new Mock<ISofisoftMongoDbContext>();
         }
@@ -28,7 +31,7 @@ namespace Sofisoft.MongoDb.Tests
             var context = (SofisoftMongoDbContext) null!;
 
             // Act
-            var exception = Assert.Throws<ArgumentNullException>(() => new MongoDbRepository<Document>(context));
+            var exception = Assert.Throws<ArgumentNullException>(() => new MongoRepository<Document>(context));
 
             // Assert
             Assert.Equal("context", exception.ParamName);
@@ -60,7 +63,7 @@ namespace Sofisoft.MongoDb.Tests
                 .Returns(expectedResult);
 
             // Act
-            var repository = new MongoDbRepository<FakeDocument>(_contextMock.Object);
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
             var result = await repository.AggregateAsync(It.IsAny<PipelineDefinition<FakeDocument, FakeResult>>(), It.IsAny<CancellationToken>());
 
             // Assert
@@ -116,7 +119,7 @@ namespace Sofisoft.MongoDb.Tests
             }
 
             // Act
-            var repository = new MongoDbRepository<FakeDocument>(_contextMock.Object);
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
             var result = await repository.CountAsync(withFilterExpresion ? filterExpression : It.IsAny<Expression<Func<FakeDocument, bool>>>(), cancellationToken);
 
             // Assert
@@ -134,7 +137,6 @@ namespace Sofisoft.MongoDb.Tests
             var collectionMock = new Mock<IMongoCollection<FakeDocument>>();
             var cancellationToken = new CancellationTokenSource().Token;
 
-
             _contextMock.Setup(x => x.HasActiveTransaction)
                 .Returns(hasActiveTransaction);
             _contextMock.Setup(x => x.GetCurrentSession())
@@ -143,7 +145,7 @@ namespace Sofisoft.MongoDb.Tests
                 .Returns(collectionMock.Object);
 
             // Act
-            var repository = new MongoDbRepository<FakeDocument>(_contextMock.Object);
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
             await repository.DeleteByIdAsync("1", cancellationToken);
 
             // Assert
@@ -161,6 +163,165 @@ namespace Sofisoft.MongoDb.Tests
                     It.IsAny<FilterDefinition<FakeDocument>>(),
                     It.IsAny<FindOneAndDeleteOptions<FakeDocument>>(),
                     cancellationToken), Times.Once);
+            }
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public async Task FilterByAsync_return_list(bool hasActiveTransaction, bool withFilterExpresion)
+        {
+            // Arrange
+            var expectedResult = new List<FakeDocument>() { new FakeDocument() };
+            var collectionMock = new Mock<IMongoCollection<FakeDocument>>();
+            var cursorMock = new Mock<IAsyncCursor<FakeDocument>>();
+            var session = new Mock<IClientSessionHandle>().Object;
+            Expression<Func<FakeDocument, bool>> filterExpression = p => p.Id == "1";
+            
+            cursorMock.SetupSequence(x => x.MoveNext(default))
+                .Returns(true)
+                .Returns(false);
+            cursorMock.SetupGet(x => x.Current).Returns(expectedResult);
+            _contextMock.Setup(x => x.HasActiveTransaction)
+                .Returns(hasActiveTransaction);
+            _contextMock.Setup(x => x.GetCurrentSession())
+                .Returns(session);
+            _contextMock.Setup(x => x.Database.GetCollection<FakeDocument>("fakeDocument", It.IsAny<MongoCollectionSettings>()))
+                .Returns(collectionMock.Object);
+
+            if (hasActiveTransaction)
+            {
+                if (withFilterExpresion)
+                {
+                    collectionMock.Setup(x => x.FindSync(session,
+                        It.IsAny<ExpressionFilterDefinition<FakeDocument>>(),
+                        It.IsAny<FindOptions<FakeDocument>>(),
+                        default))
+                        .Returns(cursorMock.Object);
+                }
+                else
+                {
+                    collectionMock.Setup(x => x.FindSync(session,
+                        FilterDefinition<FakeDocument>.Empty,
+                        It.IsAny<FindOptions<FakeDocument>>(),
+                        default))
+                        .Returns(cursorMock.Object);
+                }
+            }
+            else
+            {
+                if (withFilterExpresion)
+                {
+                    collectionMock.Setup(x => x.FindSync(It.IsAny<ExpressionFilterDefinition<FakeDocument>>(),
+                        It.IsAny<FindOptions<FakeDocument>>(),
+                        default))
+                        .Returns(cursorMock.Object);
+                }
+                else
+                {
+                    collectionMock.Setup(x => x.FindSync(FilterDefinition<FakeDocument>.Empty,
+                        It.IsAny<FindOptions<FakeDocument>>(),
+                        default))
+                        .Returns(cursorMock.Object);
+                }
+            }
+
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
+
+            // Act
+            var result = await repository.FilterByAsync(
+                withFilterExpresion ? filterExpression : It.IsAny<Expression<Func<FakeDocument, bool>>>(),
+                default);
+
+            // Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task InsertOneAsync_verified_call_inserted_one(bool hasActiveTransaction)
+        {
+            // Arrange
+            var cancellationToken = new CancellationTokenSource().Token;
+            var collectionMock = new Mock<IMongoCollection<FakeDocument>>();
+            var document = new FakeDocument();
+            var session = new Mock<IClientSessionHandle>().Object;
+            
+            _contextMock.Setup(x => x.HasActiveTransaction)
+                .Returns(hasActiveTransaction);
+            _contextMock.Setup(x => x.GetCurrentSession())
+                .Returns(session);
+            _contextMock.Setup(x => x.Database.GetCollection<FakeDocument>("fakeDocument", It.IsAny<MongoCollectionSettings>()))
+                .Returns(collectionMock.Object);
+
+            // Act
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
+
+            await repository.InsertOneAsync(document, cancellationToken);
+
+            // Assert
+            if (hasActiveTransaction)
+            {
+                collectionMock.Verify(x => x.InsertOneAsync(
+                    session,
+                    document,
+                    It.IsAny<InsertOneOptions>(),
+                    cancellationToken
+                ), Times.Once);
+            }
+            else
+            {
+                collectionMock.Verify(x => x.InsertOneAsync(
+                    document,
+                    It.IsAny<InsertOneOptions>(),
+                    cancellationToken
+                ), Times.Once);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task InsertManyAsync_verified_call_inserted_many(bool hasActiveTransaction)
+        {
+            // Arrange
+            var cancellationToken = new CancellationTokenSource().Token;
+            var collectionMock = new Mock<IMongoCollection<FakeDocument>>();
+            var documents = new List<FakeDocument> { new FakeDocument() };
+            var session = new Mock<IClientSessionHandle>().Object;
+            
+            _contextMock.Setup(x => x.HasActiveTransaction)
+                .Returns(hasActiveTransaction);
+            _contextMock.Setup(x => x.GetCurrentSession())
+                .Returns(session);
+            _contextMock.Setup(x => x.Database.GetCollection<FakeDocument>("fakeDocument", It.IsAny<MongoCollectionSettings>()))
+                .Returns(collectionMock.Object);
+
+            // Act
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
+
+            await repository.InsertManyAsync(documents, cancellationToken);
+
+            // Assert
+            if (hasActiveTransaction)
+            {
+                collectionMock.Verify(x => x.InsertManyAsync(
+                    session,
+                    documents,
+                    It.IsAny<InsertManyOptions>(),
+                    cancellationToken
+                ), Times.Once);
+            }
+            else
+            {
+                collectionMock.Verify(x => x.InsertManyAsync(
+                    documents,
+                    It.IsAny<InsertManyOptions>(),
+                    cancellationToken
+                ), Times.Once);
             }
         }
 
@@ -205,7 +366,7 @@ namespace Sofisoft.MongoDb.Tests
             }
 
             // Act
-            var repository = new MongoDbRepository<FakeDocument>(_contextMock.Object);
+            var repository = new MongoRepository<FakeDocument>(_contextMock.Object);
             var result = await repository.UpdateOneAsync(new FakeDocument(), It.IsAny<CancellationToken>());
 
             // Assert
@@ -221,5 +382,12 @@ namespace Sofisoft.MongoDb.Tests
             public string? Id { get; set; }
         }
 
+    }
+
+    public interface IFakeMongoCollection : IMongoCollection<FakeDocument>
+    {
+        IFindFluent<FakeDocument, FakeDocument> Find(FilterDefinition<FakeDocument> filter, FindOptions options);
+    
+        IFindFluent<FakeDocument, FakeDocument> Project(ProjectionDefinition<FakeDocument, FakeResult> projection);
     }
 }

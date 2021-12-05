@@ -14,6 +14,11 @@ builder.Services.AddSofisoft()
     .AddIdentity(options =>
     {
         options.SetUserIdKey("user_id");
+    })
+    .AddMongoDb(options =>
+    {
+        options.SetConnectionString("connection");
+        options.SetDatabase("database");
     });
 
 builder.Services.AddControllers();
