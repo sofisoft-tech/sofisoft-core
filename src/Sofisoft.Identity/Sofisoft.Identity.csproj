@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.Identity</PackageId>
-    <Version>1.0.0-preview.2</Version>
+    <Version>1.0.0-preview.3</Version>
     <Title>Sofisoft Identity</Title>
     <Description>Gets claims of the principal identity.</Description>
     <Authors>Sofisoft Lab</Authors>
