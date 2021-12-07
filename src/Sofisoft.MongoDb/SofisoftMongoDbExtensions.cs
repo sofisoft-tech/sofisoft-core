@@ -1,4 +1,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Driver;
+using Sofisoft.Abstractions;
+using Sofisoft.Abstractions.Repositories;
 using Sofisoft.MongoDb;
 using Sofisoft.MongoDb.Repositories;
 
@@ -22,8 +25,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.TryAddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-            builder.Services.TryAddScoped(typeof(ISofisoftMongoDbContext), typeof(SofisoftMongoDbContext));
+            builder.Services.TryAddScoped(typeof(ICommandRepository<>), typeof(CommandRepository<>));
+            builder.Services.TryAddScoped(typeof(IQueryRepository<>), typeof(QueryRepository<>));
+            builder.Services.TryAddScoped(typeof(ISofisoftDbContext<IClientSessionHandle>), typeof(SofisoftMongoDbContext));
 
             return new SofisoftMongoDbBuilder(builder.Services);
         }

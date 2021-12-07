@@ -8,13 +8,13 @@ using Sofisoft.Abstractions.Responses;
 using static Sofisoft.Abstractions.SofisoftConstants;
 using ApplicationException = Sofisoft.Abstractions.Exceptions.ApplicationException;
 
-namespace Sofisoft.Logging
+namespace Sofisoft.AspNetCore.Middlewares
 {
-    public sealed class SofisoftLoggingMiddleware : IMiddleware
+    public sealed class LoggingMiddleware : IMiddleware
     {
         private readonly ILoggerManager _logger;
 
-        public SofisoftLoggingMiddleware(ILoggerManager logger)
+        public LoggingMiddleware(ILoggerManager logger)
             => _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)

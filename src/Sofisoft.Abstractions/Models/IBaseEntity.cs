@@ -1,6 +1,6 @@
 namespace Sofisoft.Abstractions.Models
 {
-    public interface IEntity
+    public interface IBaseEntity
     {
         /// <summary>
         /// Get the Id of entity.

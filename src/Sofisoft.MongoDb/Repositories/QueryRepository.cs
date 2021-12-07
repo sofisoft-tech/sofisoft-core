@@ -1,23 +1,25 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using MongoDB.Driver;
-using Sofisoft.Abstractions.Models;
-using Sofisoft.MongoDb.Attributes;
+using Sofisoft.Abstractions;
+using Sofisoft.Abstractions.Attributes;
+using Sofisoft.Abstractions.Repositories;
+using Sofisoft.MongoDb.Models;
 
 namespace Sofisoft.MongoDb.Repositories
 {
-    public class MongoRepository<TDocument> : IMongoRepository<TDocument>
-        where TDocument : IEntity
+    public class QueryRepository<TDocument> : IQueryRepository<TDocument>
+        where TDocument : BaseEntity
     {
         #region Members
 
-        private readonly ISofisoftMongoDbContext _ctx;
+        private readonly ISofisoftDbContext<IClientSessionHandle> _ctx;
 
         #endregion
 
         #region Constructors
 
-        public MongoRepository(ISofisoftMongoDbContext context)
+        public QueryRepository(ISofisoftDbContext<IClientSessionHandle> context)
         {
             _ctx = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -26,31 +28,6 @@ namespace Sofisoft.MongoDb.Repositories
 
         #region Implementations
 
-        public virtual Task<IEnumerable<TResult>> AggregateAsync<TResult>(
-            PipelineDefinition<TDocument, TResult> pipeline,
-            CancellationToken cancellationToken = default)
-        {
-            if(_ctx.HasActiveTransaction)
-            {
-                return Task.Run(() =>
-                    GetCollection()
-                        .Aggregate(
-                            _ctx.GetCurrentSession(),
-                            pipeline,
-                            cancellationToken: cancellationToken)
-                        .ToEnumerable(cancellationToken)
-                );
-            }
-            
-            return Task.Run(() =>
-                GetCollection()
-                    .Aggregate(
-                        pipeline,
-                        cancellationToken: cancellationToken)
-                    .ToEnumerable(cancellationToken)
-            );
-        }
-
         public virtual Task<long> CountAsync(
             Expression<Func<TDocument, bool>> filterExpression,
             CancellationToken cancellationToken = default)
@@ -58,35 +35,13 @@ namespace Sofisoft.MongoDb.Repositories
             if (_ctx.HasActiveTransaction)
             {
                 return GetCollection().CountDocumentsAsync(
-                    _ctx.GetCurrentSession(),
+                    _ctx.GetCurrentTransaction(),
                     filterExpression ?? FilterDefinition<TDocument>.Empty,
                     cancellationToken: cancellationToken);
             }
 
             return GetCollection().CountDocumentsAsync(
                 filterExpression ?? FilterDefinition<TDocument>.Empty,
-                cancellationToken: cancellationToken
-            );
-        }
-
-        public virtual Task DeleteByIdAsync(
-            string id,
-            CancellationToken cancellationToken = default)
-        {
-            var filter = Builders<TDocument>
-                .Filter.Eq(doc => doc.Id, id);
-
-            if(_ctx.HasActiveTransaction)
-            {
-                return GetCollection().FindOneAndDeleteAsync(
-                    _ctx.GetCurrentSession(),
-                    filter,
-                    cancellationToken: cancellationToken
-                );
-            }
-
-            return GetCollection().FindOneAndDeleteAsync(
-                filter,
                 cancellationToken: cancellationToken
             );
         }
@@ -99,7 +54,7 @@ namespace Sofisoft.MongoDb.Repositories
             {
                 return Task.Run(() => 
                     GetCollection().Find(
-                        _ctx.GetCurrentSession(),
+                        _ctx.GetCurrentTransaction(),
                         filterExpression ?? FilterDefinition<TDocument>.Empty)
                         .ToEnumerable(cancellationToken)
                 );
@@ -122,7 +77,7 @@ namespace Sofisoft.MongoDb.Repositories
             {
                 return Task.Run(() =>
                     GetCollection().Find(
-                        _ctx.GetCurrentSession(),
+                        _ctx.GetCurrentTransaction(),
                         filterExpression ?? FilterDefinition<TDocument>.Empty)
                         .Project(projectionExpression)
                         .ToEnumerable(cancellationToken)
@@ -148,7 +103,7 @@ namespace Sofisoft.MongoDb.Repositories
             {
                 return GetCollection()
                     .Find(
-                        _ctx.GetCurrentSession(),
+                        _ctx.GetCurrentTransaction(),
                         filter)
                     .SingleOrDefaultAsync(cancellationToken);
             }
@@ -166,7 +121,7 @@ namespace Sofisoft.MongoDb.Repositories
             if(_ctx.HasActiveTransaction)
             {
                 return GetCollection().Find(
-                    _ctx.GetCurrentSession(),
+                    _ctx.GetCurrentTransaction(),
                     filterExpression ?? FilterDefinition<TDocument>.Empty)
                     .Limit(1)
                     .SingleOrDefaultAsync(cancellationToken);
@@ -189,7 +144,7 @@ namespace Sofisoft.MongoDb.Repositories
             if(_ctx.HasActiveTransaction)
             {
                 return GetCollection().Find(
-                        _ctx.GetCurrentSession(),
+                        _ctx.GetCurrentTransaction(),
                         filterExpression ?? FilterDefinition<TDocument>.Empty)
                     .Project(projectionExpression)
                     .Limit(1)
@@ -201,44 +156,6 @@ namespace Sofisoft.MongoDb.Repositories
                 .Project(projectionExpression)
                 .Limit(1)
                 .SingleOrDefaultAsync(cancellationToken);
-        }
-
-        public virtual Task InsertOneAsync(
-            TDocument entity,
-            CancellationToken cancellationToken = default)
-        {
-            if(_ctx.HasActiveTransaction)
-            {
-                return GetCollection()
-                    .InsertOneAsync(
-                        _ctx.GetCurrentSession(),
-                        entity,
-                        cancellationToken: cancellationToken);
-            }
-
-            return GetCollection()
-                    .InsertOneAsync(
-                        entity,
-                        cancellationToken: cancellationToken);
-        }
-
-        public virtual Task InsertManyAsync(
-            ICollection<TDocument> entities,
-            CancellationToken cancellationToken = default)
-        {
-            if(_ctx.HasActiveTransaction)
-            {
-                return GetCollection()
-                    .InsertManyAsync(
-                        _ctx.GetCurrentSession(),
-                        entities,
-                        cancellationToken: cancellationToken);
-            }
-
-            return GetCollection()
-                .InsertManyAsync(
-                    entities,
-                    cancellationToken: cancellationToken);
         }
 
         [ExcludeFromCodeCoverage]
@@ -253,7 +170,7 @@ namespace Sofisoft.MongoDb.Repositories
             {
                 return Task.Run(() => 
                     GetCollection().Find(
-                            _ctx.GetCurrentSession(),
+                            _ctx.GetCurrentTransaction(),
                             filterExpression ?? FilterDefinition<TDocument>.Empty)
                         .Sort(sort)
                         .Skip(start)
@@ -285,7 +202,7 @@ namespace Sofisoft.MongoDb.Repositories
             {
                 return Task.Run(() => 
                     GetCollection().Find(
-                            _ctx.GetCurrentSession(),
+                            _ctx.GetCurrentTransaction(),
                             filterExpression ?? FilterDefinition<TDocument>.Empty)
                         .Project(projectionExpression)
                         .Sort(sort)
@@ -306,49 +223,13 @@ namespace Sofisoft.MongoDb.Repositories
             );
         }
 
-        public virtual Task<long> UpdateOneAsync(
-            TDocument entity,
-            CancellationToken cancellationToken = default)
-        {
-            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, entity.Id);
-            var update = GetUpdateDefinition(entity);
-            var options = new UpdateOptions { IsUpsert = false };
-
-            if(_ctx.HasActiveTransaction)
-            {
-                return Task.Run(() =>
-                {
-                    var updateResult = GetCollection()
-                        .UpdateOne(
-                            _ctx.GetCurrentSession(),
-                            filter,
-                            update,
-                            options, cancellationToken);
-
-                    return updateResult.ModifiedCount;
-                }, cancellationToken);
-            }
-
-            return Task.Run(() =>
-            {
-                var updateResult = GetCollection()
-                    .UpdateOne(
-                        filter,
-                        update,
-                        options,
-                        cancellationToken);
-
-                    return updateResult.ModifiedCount;
-                }, cancellationToken);
-        }
-
         #endregion
 
         #region  Publics Methods
 
         public IMongoCollection<TDocument> GetCollection()
         {
-            return _ctx.Database
+            return _ctx.GetDatabase<IMongoDatabase>()
                 .GetCollection<TDocument>(
                     GetCollectionName(typeof(TDocument)));
         }
@@ -370,19 +251,6 @@ namespace Sofisoft.MongoDb.Repositories
             }
 
             return attribute.CollectionName;
-        }
-
-        private static UpdateDefinition<TDocument> GetUpdateDefinition(TDocument document)
-        {
-            var builder = new UpdateDefinitionBuilder<TDocument>();
-            var updates = document.GetType().GetProperties()
-                    .Where(x => !new string[] { "Id", "CreatedAt", "CreatedBy" }.Contains(x.Name)
-                        && (x.GetValue(document) is not null || x.Name == "ModifiedAt"))
-                    .Select(x => x.Name == "ModifiedAt"
-                        ? builder.Set(x.Name, DateTime.UtcNow)
-                        : builder.Set(x.Name, x.GetValue(document)));
-            
-            return builder.Combine(updates);
         }
 
         #endregion

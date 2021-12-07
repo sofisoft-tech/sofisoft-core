@@ -6,17 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <PropertyGroup>
-    <PackageId>Sofisoft.Identity</PackageId>
+    <PackageId>Sofisoft.MongoDb.Models</PackageId>
     <Version>1.0.0-preview.4</Version>
-    <Title>Sofisoft Identity</Title>
-    <Description>Gets claims of the principal identity.</Description>
+    <Title>Sofisoft MongoDb Models</Title>
+    <Description>Sofisoft's models used for pattern repository.</Description>
     <Authors>Sofisoft Lab</Authors>
     <Company>Sofisoft Technologies SAC</Company>
     <Copyright>© Sofisoft Technologies. All rights reserved.</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageTags>identity, claims</PackageTags>
+    <PackageTags>pattern-repository, mongoDb, mongoDb-repository</PackageTags>
     <RepositoryUrl>https://github.com/sofisoft-tech/sofisoft-core</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
@@ -28,7 +28,6 @@
     <ProjectReference Include="..\Sofisoft.Abstractions\Sofisoft.Abstractions.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2"/>
-    <PackageReference Include="Microsoft.Net.Http.Headers" Version="2.2.8"/>
+    <PackageReference Include="MongoDB.Bson" Version="2.14.1"/>
   </ItemGroup>
 </Project>

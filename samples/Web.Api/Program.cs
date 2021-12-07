@@ -1,3 +1,4 @@
+using MongoDB.Driver;
 using Sofisoft.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +45,10 @@ app.UseRequestLocalization(options =>
     options.AddSupportedUICultures(supportedCultures);
 });
 
-app.UseMiddleware<SofisoftLoggingMiddleware>();
+app.UseLogging();
+app.UseDbTransaction<IClientSessionHandle>();
+
+// app.UseMiddleware<SofisoftLoggingMiddleware>();
 
 app.UseRouting();
 app.UseAuthorization();

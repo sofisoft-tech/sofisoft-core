@@ -13,15 +13,16 @@ using Moq;
 using Sofisoft.Abstractions;
 using Sofisoft.Abstractions.Exceptions;
 using Sofisoft.Abstractions.Managers;
+using Sofisoft.AspNetCore.Middlewares;
 using Xunit;
 
-namespace Sofisoft.Logging.Tests
+namespace Sofisoft.AspNetCore.Tests.Middlewares
 {
-    public class SofisoftLoggingMiddlewareTest
+    public class LoggingMiddlewareTest
     {
         private readonly Mock<ILoggerManager> _loggerManagerMock;
 
-        public SofisoftLoggingMiddlewareTest()
+        public LoggingMiddlewareTest()
         {
             _loggerManagerMock = new Mock<ILoggerManager>();
         }
@@ -33,7 +34,7 @@ namespace Sofisoft.Logging.Tests
             var logger = (ILoggerManager) null!;
 
             // Act
-            var exception = Assert.Throws<ArgumentNullException>(() => new SofisoftLoggingMiddleware(logger));
+            var exception = Assert.Throws<ArgumentNullException>(() => new LoggingMiddleware(logger));
 
             // Assert
             Assert.Equal("logger", exception.ParamName);
@@ -89,7 +90,7 @@ namespace Sofisoft.Logging.Tests
             var httpContext = httpContextMock.Object;
 
             // Act
-            var middleware = new SofisoftLoggingMiddleware(_loggerManagerMock.Object);
+            var middleware = new LoggingMiddleware(_loggerManagerMock.Object);
             await middleware.InvokeAsync(httpContext, nextMiddleware);
 
             // Assert
@@ -115,7 +116,7 @@ namespace Sofisoft.Logging.Tests
             var httpContext = httpContextMock.Object;
 
             // Act
-            var middleware = new SofisoftLoggingMiddleware(_loggerManagerMock.Object);
+            var middleware = new LoggingMiddleware(_loggerManagerMock.Object);
             await middleware.InvokeAsync(httpContext, nextMiddleware);
 
             // Assert

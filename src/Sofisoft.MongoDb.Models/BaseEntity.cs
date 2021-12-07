@@ -4,7 +4,7 @@ using Sofisoft.Abstractions.Models;
 
 namespace Sofisoft.MongoDb.Models
 {
-    public abstract class Document : IEntity
+    public abstract class BaseEntity : IBaseEntity
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

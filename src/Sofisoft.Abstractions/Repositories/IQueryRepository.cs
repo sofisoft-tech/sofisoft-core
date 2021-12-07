@@ -3,8 +3,8 @@ using Sofisoft.Abstractions.Models;
 
 namespace Sofisoft.Abstractions.Repositories
 {
-    public interface IRepository<TEntity>
-        where TEntity : IEntity
+    public interface IQueryRepository<TEntity>
+        where TEntity : IBaseEntity
     {
         /// <summary>
         /// Returns number of records according to the expression.
@@ -13,15 +13,6 @@ namespace Sofisoft.Abstractions.Repositories
         /// <param name="cancellationToken">cancellation token.</param>
         Task<long> CountAsync(
             Expression<Func<TEntity, bool>> filterExpression,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Delete a record from the database by Id.
-        /// </summary>
-        /// <param name="id">Entity id.</param>
-        /// <param name="cancellationToken">cancellation token.</param>
-        Task DeleteByIdAsync(
-            string id,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -74,24 +65,6 @@ namespace Sofisoft.Abstractions.Repositories
             CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Insert a single entity
-        /// </summary>
-        /// <param name="entity">Entity to be inserted.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        Task InsertOneAsync(
-            TEntity entity,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Insert many entities.
-        /// </summary>
-        /// <param name="entities">Collection of entities to be inserted.</param>
-        /// <param name="cancellationToken">cancellation token.</param>
-        Task InsertManyAsync(
-            ICollection<TEntity> entities,
-            CancellationToken cancellationToken = default);
-
-        /// <summary>
         /// Returns paged list.
         /// </summary>
         /// <param name="filterExpression">Expression to filter.</param>
@@ -123,13 +96,5 @@ namespace Sofisoft.Abstractions.Repositories
             int start,
             CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Update a single entity.
-        /// </summary>
-        /// <param name="entity">Entity being modified.</param>
-        /// <param name="cancellationToken">cancellation token.</param>
-        Task<long> UpdateOneAsync(
-            TEntity entity,
-            CancellationToken cancellationToken = default);
     }
 }

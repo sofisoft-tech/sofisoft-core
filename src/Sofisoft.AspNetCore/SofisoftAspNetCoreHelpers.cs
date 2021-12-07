@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Sofisoft.Abstractions;
 
-namespace Sofisoft.Logging
+namespace Sofisoft.AspNetCore
 {
-    public static class SofisoftLoggingHelpers
+    public static class SofisoftAspNetCoreHelpers
     {
         public static SofisoftConfiguration GetSofisoftConfiguration(this IServiceProvider serviceProvider)
         {

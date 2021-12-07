@@ -1,11 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using Sofisoft.Abstractions;
 
 namespace Sofisoft.MongoDb
 {
     [ExcludeFromCodeCoverage]
-    public class SofisoftMongoDbContext : ISofisoftMongoDbContext
+    public class SofisoftMongoDbContext : ISofisoftDbContext<IClientSessionHandle>
     {
         #region Variables
 
@@ -19,15 +20,22 @@ namespace Sofisoft.MongoDb
 
         public SofisoftMongoDbContext(IOptionsMonitor<SofisoftMongoDbOptions> options)
         {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _client = new MongoClient(options.CurrentValue.ConnectionString);
             _database = _client.GetDatabase(options.CurrentValue.Database);
         }
 
         #endregion
 
-        #region Methods
+        #region Implements
 
-        public async Task<IClientSessionHandle?> BeginSessionAsync()
+        public bool HasActiveTransaction => _currentSession != null && _currentSession.IsInTransaction;
+
+        public async Task<IClientSessionHandle?> BeginTransactionAsync()
         {
             if (_currentSession is not null)
             {
@@ -35,18 +43,32 @@ namespace Sofisoft.MongoDb
             }
 
             _currentSession = await _client.StartSessionAsync();
+            _currentSession.StartTransaction();
 
             return _currentSession;
         }
 
-        public IClientSessionHandle? GetCurrentSession() => _currentSession;
+        public async Task CommitTransactionAsync(IClientSessionHandle? transaction)
+        {
+            if (transaction is null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
 
-        #endregion
+            if (transaction != _currentSession)
+            {
+                throw new InvalidOperationException($"Session {transaction.ServerSession.Id} is not current");
+            }
 
-        #region Properties
+            await transaction.CommitTransactionAsync();
+        }
 
-        public IMongoDatabase Database => _database;
-        public bool HasActiveTransaction => _currentSession != null && _currentSession.IsInTransaction;
+        public IClientSessionHandle? GetCurrentTransaction() => _currentSession;
+
+        public TDatabase GetDatabase<TDatabase>()
+        {
+            return (TDatabase) _database;
+        }
 
         #endregion
     }

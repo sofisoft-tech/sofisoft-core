@@ -24,7 +24,6 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             builder.Services.TryAddScoped<ILoggerManager, LoggerManager>();
-            builder.Services.TryAddScoped<SofisoftLoggingMiddleware>();
 
             return new SofisoftLoggingBuilder(builder.Services);
         }

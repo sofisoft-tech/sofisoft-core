@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.Logging</PackageId>
-    <Version>1.0.0-preview.3</Version>
+    <Version>1.0.0-preview.4</Version>
     <Title>Sofisoft Logger</Title>
     <Description>Sofisoft's logging used for errors handlers.</Description>
     <Authors>Sofisoft Lab</Authors>
@@ -27,7 +27,6 @@
     <ProjectReference Include="..\Sofisoft.Abstractions\Sofisoft.Abstractions.csproj"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2"/>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
   </ItemGroup>
 </Project>
