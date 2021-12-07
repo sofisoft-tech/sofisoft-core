@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.Abstractions</PackageId>
-    <Version>1.0.0-preview.4</Version>
+    <Version>1.0.0-preview.5</Version>
     <Title>Sofisoft Abstractions</Title>
     <Description>Abstractions and more used for Sofisoft services.</Description>
     <Authors>Sofisoft Lab</Authors>

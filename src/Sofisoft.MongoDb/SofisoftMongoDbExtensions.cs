@@ -25,8 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Services.TryAddScoped(typeof(ICommandRepository<>), typeof(CommandRepository<>));
-            builder.Services.TryAddScoped(typeof(IQueryRepository<>), typeof(QueryRepository<>));
+            builder.Services.TryAddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
             builder.Services.TryAddScoped(typeof(ISofisoftDbContext<IClientSessionHandle>), typeof(SofisoftMongoDbContext));
 
             return new SofisoftMongoDbBuilder(builder.Services);

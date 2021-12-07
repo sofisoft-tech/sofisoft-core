@@ -3,7 +3,7 @@ using Sofisoft.Abstractions.Models;
 
 namespace Sofisoft.Abstractions.Repositories
 {
-    public interface IQueryRepository<TEntity>
+    public interface IBaseRepository<TEntity>
         where TEntity : IBaseEntity
     {
         /// <summary>
@@ -13,6 +13,15 @@ namespace Sofisoft.Abstractions.Repositories
         /// <param name="cancellationToken">cancellation token.</param>
         Task<long> CountAsync(
             Expression<Func<TEntity, bool>> filterExpression,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Delete a record from the database by Id.
+        /// </summary>
+        /// <param name="id">Entity id.</param>
+        /// <param name="cancellationToken">cancellation token.</param>
+        Task DeleteByIdAsync(
+            string id,
             CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -65,6 +74,15 @@ namespace Sofisoft.Abstractions.Repositories
             CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Insert many entities.
+        /// </summary>
+        /// <param name="entities">Collection of entities to be inserted.</param>
+        /// <param name="cancellationToken">cancellation token.</param>
+        Task InsertManyAsync(
+            ICollection<TEntity> entities,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Returns paged list.
         /// </summary>
         /// <param name="filterExpression">Expression to filter.</param>
@@ -94,6 +112,15 @@ namespace Sofisoft.Abstractions.Repositories
             string sort,
             int pageSize,
             int start,
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Update a single entity.
+        /// </summary>
+        /// <param name="entity">Entity being modified.</param>
+        /// <param name="cancellationToken">cancellation token.</param>
+        Task<long> UpdateOneAsync(
+            TEntity entity,
             CancellationToken cancellationToken = default);
 
     }

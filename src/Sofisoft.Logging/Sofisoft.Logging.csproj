@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.Logging</PackageId>
-    <Version>1.0.0-preview.4</Version>
+    <Version>1.0.0-preview.5</Version>
     <Title>Sofisoft Logger</Title>
     <Description>Sofisoft's logging used for errors handlers.</Description>
     <Authors>Sofisoft Lab</Authors>

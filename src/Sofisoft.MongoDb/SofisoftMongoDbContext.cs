@@ -48,7 +48,33 @@ namespace Sofisoft.MongoDb
             return _currentSession;
         }
 
-        public async Task CommitTransactionAsync(IClientSessionHandle? transaction)
+        public Task CommitTransactionAsync(IClientSessionHandle? transaction)
+        {
+            if (transaction is null)
+            {
+                throw new ArgumentNullException(nameof(transaction));
+            }
+
+            if (transaction != _currentSession)
+            {
+                throw new InvalidOperationException($"Session {transaction.ServerSession.Id} is not current");
+            }
+
+            return CommitTransactionInternalAsync(transaction);
+        }
+
+        public IClientSessionHandle? GetCurrentTransaction() => _currentSession;
+
+        public TDatabase GetDatabase<TDatabase>()
+        {
+            return (TDatabase) _database;
+        }
+
+        #endregion
+
+        #region privates methods
+
+        private async Task CommitTransactionInternalAsync(IClientSessionHandle? transaction)
         {
             if (transaction is null)
             {
@@ -61,13 +87,6 @@ namespace Sofisoft.MongoDb
             }
 
             await transaction.CommitTransactionAsync();
-        }
-
-        public IClientSessionHandle? GetCurrentTransaction() => _currentSession;
-
-        public TDatabase GetDatabase<TDatabase>()
-        {
-            return (TDatabase) _database;
         }
 
         #endregion

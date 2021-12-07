@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.MongoDb</PackageId>
-    <Version>1.0.0-preview.4</Version>
+    <Version>1.0.0-preview.5</Version>
     <Title>Sofisoft MongoDb</Title>
     <Description>Sofisoft's service used for pattern repository.</Description>
     <Authors>Sofisoft Lab</Authors>

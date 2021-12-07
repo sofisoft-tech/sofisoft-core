@@ -6,7 +6,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.AspNetCore</PackageId>
-    <Version>1.0.0-preview.4</Version>
+    <Version>1.0.0-preview.5</Version>
     <Title>Sofisoft AspNetCore</Title>
     <Description>Sofisoft's extensions for AspNetCore.</Description>
     <Authors>Sofisoft Lab</Authors>
