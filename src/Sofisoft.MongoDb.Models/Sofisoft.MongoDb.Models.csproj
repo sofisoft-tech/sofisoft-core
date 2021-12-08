@@ -7,7 +7,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PackageId>Sofisoft.MongoDb.Models</PackageId>
-    <Version>1.0.0-preview.5</Version>
+    <Version>1.0.0-preview.6</Version>
     <Title>Sofisoft MongoDb Models</Title>
     <Description>Sofisoft's models used for pattern repository.</Description>
     <Authors>Sofisoft Lab</Authors>

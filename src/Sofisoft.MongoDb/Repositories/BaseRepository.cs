@@ -180,25 +180,6 @@ namespace Sofisoft.MongoDb.Repositories
                 .SingleOrDefaultAsync(cancellationToken);
         }
 
-        public virtual Task InsertOneAsync(
-            TDocument entity,
-            CancellationToken cancellationToken = default)
-        {
-            if(_ctx.HasActiveTransaction)
-            {
-                return GetCollection()
-                    .InsertOneAsync(
-                        _ctx.GetCurrentTransaction(),
-                        entity,
-                        cancellationToken: cancellationToken);
-            }
-
-            return GetCollection()
-                    .InsertOneAsync(
-                        entity,
-                        cancellationToken: cancellationToken);
-        }
-
         public virtual Task InsertManyAsync(
             ICollection<TDocument> entities,
             CancellationToken cancellationToken = default)
@@ -216,6 +197,25 @@ namespace Sofisoft.MongoDb.Repositories
                 .InsertManyAsync(
                     entities,
                     cancellationToken: cancellationToken);
+        }
+
+        public virtual Task InsertOneAsync(
+            TDocument entity,
+            CancellationToken cancellationToken = default)
+        {
+            if(_ctx.HasActiveTransaction)
+            {
+                return GetCollection()
+                    .InsertOneAsync(
+                        _ctx.GetCurrentTransaction(),
+                        entity,
+                        cancellationToken: cancellationToken);
+            }
+
+            return GetCollection()
+                    .InsertOneAsync(
+                        entity,
+                        cancellationToken: cancellationToken);
         }
 
         [ExcludeFromCodeCoverage]

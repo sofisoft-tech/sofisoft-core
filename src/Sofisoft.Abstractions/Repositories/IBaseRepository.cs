@@ -83,6 +83,15 @@ namespace Sofisoft.Abstractions.Repositories
             CancellationToken cancellationToken = default);
 
         /// <summary>
+         /// Insert a single entity
+         /// </summary>
+         /// <param name="entity">Entity to be inserted.</param>
+         /// <param name="cancellationToken">Cancellation token.</param>
+         Task InsertOneAsync(
+             TEntity entity,
+             CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Returns paged list.
         /// </summary>
         /// <param name="filterExpression">Expression to filter.</param>
